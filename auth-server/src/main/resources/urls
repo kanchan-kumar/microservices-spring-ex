@@ -1,0 +1,39 @@
+
+For Authorization Code Grant Type
+http://localhost:8085/oauth/authorize?response_type=code&client_id=couponClientApp&scope=read
+
+http://localhost:8085/oauth/token
+Header: Authorization - using client app credentials
+Form Field
+code - Returned code from authorized request after login
+grant_type - authorization_code
+scopes -
+
+For Password Grant Type
+To get token
+http://localhost:8081/oauth/token
+Form Field
+username
+password
+grant_type - password
+scopes - read write
+
+The response is like
+{
+"access_token": "46ca657b-a682-4080-8f0e-d6674e41e8a7",
+"token_type": "bearer",
+"refresh_token": "b1825182-63ed-4ce0-94f8-adf30fa52453",
+"expires_in": 43199,
+"scope": "read write"
+}
+
+To use token
+http://localhost:8081/couponapi/coupons/SUPERSALE
+Header
+Authorization Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsiY291cG9uc2VydmljZSJdLCJ1c2VyX25hbWUiOiJqb2huQGZlcmd1c29uLmNvbSIsInNjb3BlIjpbInJlYWQiLCJ3cml0ZSJdLCJleHAiOjE2MTc3NjY0NTMsImF1dGhvcml0aWVzIjpbIlJPTEVfVVNFUiJdLCJqdGkiOiI4MWEzNjk2My1hZDU2LTRkODctOWZjZC02OTY3ZDcwMmVmNzkiLCJjbGllbnRfaWQiOiJjb3Vwb25DbGllbnRBcHAifQ.MucFCZygr15Bm1GoOhbZZvxMpk8QRZ29Jk89aFBvJI2-Urqy_lduO6IVmtI4-6cSRyT8ZcO6Ll755iUyXZKnM0wVuDPX2PS0XLsa5tjCRJqoEZBCyRF_X9sutoO-EuxQ_9ChXsRpSwLsen1rSShzvYRSGZU-AfIiLHMqJei6V2rmTtItVe6BGNV8IvUjXXIvwuKRkppMmAkjM5aIQ4feFXEUZjoAIktxjavpRkgKKRi88Q_kLDv3Vy_UOvpIYxQ3cvFrz4lxESWC93EMDL7CkgQV5Rg2v2yAnUar6SIsZi9O_sXXnB2i1mu_LCoEFEdGvGofnN9yeBmttO-X1XL80g
+
+
+
+
+
+
