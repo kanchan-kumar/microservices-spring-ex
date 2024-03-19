@@ -1,0 +1,67 @@
+sequenceDiagram
+
+Title: Event Processing Sequence
+
+participant Database
+participant Event Lookup Table Consumer
+participant Impact Event message processor
+participant Settlement Data Enricher
+participant Update TSL Table
+
+Database->Event Lookup Table Consumer: Provide Lookup Table Data
+
+Event Lookup Table Consumer->Impact Event message processor: Receive ST Event Message
+activate Impact Event message processor
+
+alt ST Event is available for SI Event
+    Event Lookup Table Consumer->Impact Event message processor: Receive SI Event Message
+    activate Impact Event message processor
+
+    Impact Event message processor->Settlement Data Enricher: Enrich Settlement Data
+    activate Settlement Data Enricher
+    Settlement Data Enricher->Impact Event message processor: Enrichment Complete
+
+    Impact Event message processor->Update TSL Table: Update TSL Data
+    activate Update TSL Table
+    Update TSL Table-->Impact Event message processor: TSL Table Updated
+    deactivate Update TSL Table
+else No ST Event available for SI Event
+    Event Lookup Table Consumer->Impact Event message processor: Skip SI Event Processing
+    activate Impact Event message processor
+end
+
+alt ST Event is available for TF Event
+    Event Lookup Table Consumer->Impact Event message processor: Receive TF Event Message
+    activate Impact Event message processor
+
+    Impact Event message processor->Settlement Data Enricher: Enrich Settlement Data
+    activate Settlement Data Enricher
+    Settlement Data Enricher->Impact Event message processor: Enrichment Complete
+
+    Impact Event message processor->Update TSL Table: Update TSL Data
+    activate Update TSL Table
+    Update TSL Table-->Impact Event message processor: TSL Table Updated
+    deactivate Update TSL Table
+else No ST Event available for TF Event
+    Event Lookup Table Consumer->Impact Event message processor: Skip TF Event Processing
+    activate Impact Event message processor
+end
+
+alt ST Event is available for IF Event
+    Event Lookup Table Consumer->Impact Event message processor: Receive IF Event Message
+    activate Impact Event message processor
+
+    Impact Event message processor->Settlement Data Enricher: Enrich Settlement Data
+    activate Settlement Data Enricher
+    Settlement Data Enricher->Impact Event message processor: Enrichment Complete
+
+    Impact Event message processor->Update TSL Table: Update TSL Data
+    activate Update TSL Table
+    Update TSL Table-->Impact Event message processor: TSL Table Updated
+    deactivate Update TSL Table
+else No ST Event available for IF Event
+    Event Lookup Table Consumer->Impact Event message processor: Skip IF Event Processing
+    activate Impact Event message processor
+end
+
+Impact Event message processor->Event Lookup Table Consumer: Send Acknowledgment

@@ -1,0 +1,64 @@
+sequenceDiagram
+
+Title: XGEN Settlement Data Consumer Sequence Diagram
+
+participant KafkaTopic
+participant KafkaConsumerGroup
+participant ST Consumer Thread
+participant SI Consumer Thread
+participant IF Consumer Thread
+participant TF Consumer Thread
+
+loop
+    KafkaConsumerGroup -> ST Consumer Thread: Check 'Read from Custom Offset Flag' is set
+    alt Read from Custom Offset Flag is set
+        ST Consumer Thread -> KafkaTopic: Manually Seek to Custom Offset
+    end
+    KafkaConsumerGroup -> KafkaTopic: Poll for Messages
+    KafkaTopic -> ST Consumer Thread: Deliver Message
+    ST Consumer Thread -> ST Consumer Thread: Process Messages
+    ST Consumer Thread -> ST Consumer Thread: Store Offset for Later Use
+    ST Consumer Thread -> KafkaTopic: Async Manual Commit
+    alt Async Manual Commit Failed
+        ST Consumer Thread -> KafkaTopic: Sync Manual Commit
+    end
+
+    KafkaConsumerGroup -> SI Consumer Thread: Check 'Read from Custom Offset Flag' is set
+    alt Read from Custom Offset Flag is set
+        SI Consumer Thread -> KafkaTopic: Manually Seek to Custom Offset
+    end
+    KafkaConsumerGroup -> KafkaTopic: Poll for Messages
+    KafkaTopic -> SI Consumer Thread: Deliver Message
+    SI Consumer Thread -> SI Consumer Thread: Process Messages
+    SI Consumer Thread -> SI Consumer Thread: Store Offset for Later Use
+    SI Consumer Thread -> KafkaTopic: Async Manual Commit
+    alt Async Manual Commit Failed
+        SI Consumer Thread -> KafkaTopic: Sync Manual Commit
+    end
+
+    KafkaConsumerGroup -> IF Consumer Thread: Check 'Read from Custom Offset Flag' is set
+    alt Read from Custom Offset Flag is set
+        IF Consumer Thread -> KafkaTopic: Manually Seek to Custom Offset
+    end
+    KafkaConsumerGroup -> KafkaTopic: Poll for Messages
+    KafkaTopic -> IF Consumer Thread: Deliver Message
+    IF Consumer Thread -> IF Consumer Thread: Process Messages
+    IF Consumer Thread -> IF Consumer Thread: Store Offset for Later Use
+    IF Consumer Thread -> KafkaTopic: Async Manual Commit
+    alt Async Manual Commit Failed
+        IF Consumer Thread -> KafkaTopic: Sync Manual Commit
+    end
+
+    KafkaConsumerGroup -> TF Consumer Thread: Check 'Read from Custom Offset Flag' is set
+    alt Read from Custom Offset Flag is set
+        TF Consumer Thread -> KafkaTopic: Manually Seek to Custom Offset
+    end
+    KafkaConsumerGroup -> KafkaTopic: Poll for Messages
+    KafkaTopic -> TF Consumer Thread: Deliver Message
+    TF Consumer Thread -> TF Consumer Thread: Process Messages
+    TF Consumer Thread -> TF Consumer Thread: Store Offset for Later Use
+    TF Consumer Thread -> KafkaTopic: Async Manual Commit
+    alt Async Manual Commit Failed
+        TF Consumer Thread -> KafkaTopic: Sync Manual Commit
+    end
+end

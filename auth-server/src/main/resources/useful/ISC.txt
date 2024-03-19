@@ -1,0 +1,71 @@
+sequenceDiagram
+
+Title: XGEN Settlement Data Consumer Sequence Diagram
+
+participant Impact Kafka Topic
+participant KafkaConsumerGroup
+participant ST Consumer Thread
+participant SI Consumer Thread
+participant IF Consumer Thread
+participant TF Consumer Thread
+participant BCML Message Parser
+participant Message Persister
+
+loop
+    KafkaConsumerGroup -> Impact Kafka Topic: Poll for Messages
+    alt Manual Offset Flag is enabled
+        KafkaConsumerGroup -> ST Consumer Thread: Manually Seek to Custom Offset
+    end
+    Impact Kafka Topic -> ST Consumer Thread: Deliver Message
+    ST Consumer Thread -> ST Consumer Thread: Process Message
+    ST Consumer Thread -> BCML Message Parser: Parse Message
+    BCML Message Parser -> Message Persister: Persist Parsed Message
+    ST Consumer Thread -> ST Consumer Thread: Store Offset for Later Use
+    ST Consumer Thread -> Impact Kafka Topic: Async Manual Commit
+    alt Async Manual Commit Failed
+        ST Consumer Thread -> Impact Kafka Topic: Sync Manual Commit
+    end
+
+    KafkaConsumerGroup -> Impact Kafka Topic: Poll for Messages
+    alt Manual Offset Flag is enabled
+        KafkaConsumerGroup -> SI Consumer Thread: Manually Seek to Custom Offset
+    end
+    Impact Kafka Topic -> SI Consumer Thread: Deliver Message
+    SI Consumer Thread -> SI Consumer Thread: Process Message
+    SI Consumer Thread -> BCML Message Parser: Parse Message
+    BCML Message Parser -> Message Persister: Persist Parsed Message
+    SI Consumer Thread -> SI Consumer Thread: Store Offset for Later Use
+    SI Consumer Thread -> Impact Kafka Topic: Async Manual Commit
+    alt Async Manual Commit Failed
+        SI Consumer Thread -> Impact Kafka Topic: Sync Manual Commit
+    end
+
+    KafkaConsumerGroup -> Impact Kafka Topic: Poll for Messages
+    alt Manual Offset Flag is enabled
+        KafkaConsumerGroup -> IF Consumer Thread: Manually Seek to Custom Offset
+    end
+    Impact Kafka Topic -> IF Consumer Thread: Deliver Message
+    IF Consumer Thread -> IF Consumer Thread: Process Message
+    IF Consumer Thread -> BCML Message Parser: Parse Message
+    BCML Message Parser -> Message Persister: Persist Parsed Message
+    IF Consumer Thread -> IF Consumer Thread: Store Offset for Later Use
+    IF Consumer Thread -> Impact Kafka Topic: Async Manual Commit
+    alt Async Manual Commit Failed
+        IF Consumer Thread -> Impact Kafka Topic: Sync Manual Commit
+    end
+
+    KafkaConsumerGroup -> Impact Kafka Topic: Poll for Messages
+    alt Manual Offset Flag is enabled
+        KafkaConsumerGroup -> TF Consumer Thread: Manually Seek to Custom Offset
+    end
+    Impact Kafka Topic -> TF Consumer Thread: Deliver Message
+    TF Consumer Thread -> TF Consumer Thread: Process Message
+    TF Consumer Thread -> BCML Message Parser: Parse Message
+    BCML Message Parser -> Message Persister: Persist Parsed Message
+    TF Consumer Thread -> TF Consumer Thread: Store Offset for Later Use
+    TF Consumer Thread -> Impact Kafka Topic: Async Manual Commit
+    alt Async Manual Commit Failed
+        TF Consumer Thread -> Impact Kafka Topic: Sync Manual Commit
+    end
+end
+
